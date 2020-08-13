@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "Half-Light.h"
+#include <strsafe.h>
 
 #define MAX_LOADSTRING 100
 
@@ -17,6 +18,18 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
+
+void registerRawInputDevice()
+{
+	RAWINPUTDEVICE dev;
+	dev.usUsagePage = 1;
+	dev.usUsage = 6;
+	dev.dwFlags = 0;
+	dev.hwndTarget = NULL;
+
+	RegisterRawInputDevices(&dev, 1, sizeof(dev));
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
@@ -26,6 +39,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
+
+	registerRawInputDevice();
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -150,6 +165,63 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
+	case WM_INPUT:
+		{
+		UINT dwSize;
+
+		GetRawInputData((HRAWINPUT)lParam, RID_INPUT, NULL, &dwSize,
+			sizeof(RAWINPUTHEADER));
+		LPBYTE lpb = new BYTE[dwSize];
+		if (lpb == NULL)
+		{
+			return 0;
+		}
+
+		if (GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize,
+			sizeof(RAWINPUTHEADER)) != dwSize)
+			OutputDebugString(TEXT("GetRawInputData does not return correct size !\n"));
+
+		RAWINPUT* raw = (RAWINPUT*)lpb;
+
+		TCHAR szTempOutput[100];
+
+		if (raw->header.dwType == RIM_TYPEKEYBOARD)
+		{
+			auto hResult = StringCchPrintf(szTempOutput, STRSAFE_MAX_CCH, TEXT(" Kbd: make=%04x Flags:%04x Reserved:%04x ExtraInformation:%08x, msg=%04x VK=%04x \n"),
+				raw->data.keyboard.MakeCode,
+				raw->data.keyboard.Flags,
+				raw->data.keyboard.Reserved,
+				raw->data.keyboard.ExtraInformation,
+				raw->data.keyboard.Message,
+				raw->data.keyboard.VKey);
+			if (FAILED(hResult))
+			{
+				// TODO: write error handler
+			}
+			OutputDebugString(szTempOutput);
+		}
+		else if (raw->header.dwType == RIM_TYPEMOUSE)
+		{
+			auto hResult = StringCchPrintf(szTempOutput, STRSAFE_MAX_CCH, TEXT("Mouse: usFlags=%04x ulButtons=%04x usButtonFlags=%04x usButtonData=%04x ulRawButtons=%04x lLastX=%04x lLastY=%04x ulExtraInformation=%04x\r\n"),
+				raw->data.mouse.usFlags,
+				raw->data.mouse.ulButtons,
+				raw->data.mouse.usButtonFlags,
+				raw->data.mouse.usButtonData,
+				raw->data.mouse.ulRawButtons,
+				raw->data.mouse.lLastX,
+				raw->data.mouse.lLastY,
+				raw->data.mouse.ulExtraInformation);
+
+			if (FAILED(hResult))
+			{
+				// TODO: write error handler
+			}
+			OutputDebugString(szTempOutput);
+		}
+
+		delete[] lpb;
+		return 0;
+		}
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
