@@ -35,6 +35,9 @@
     <ClCompile Include="Half-Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="corsair.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Half-Light.rc">
