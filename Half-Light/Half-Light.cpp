@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "corsair.h"
 #include "Half-Light.h"
 #include <strsafe.h>
 
