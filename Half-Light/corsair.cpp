@@ -79,7 +79,13 @@ int setBaseColor()
 		ledColors[i].b = 0;
 	}
 
-	CorsairSetLedsColors(keyboardLeds->numberOfLed, ledColors);
+	bool corsiarSuccess = CorsairSetLedsColors(keyboardLeds->numberOfLed, ledColors);
+	if (corsiarSuccess != true) {
+		CorsairGetLastError();
+		return -1;
+	}
 
 	return 0;
 }
+
+int 
