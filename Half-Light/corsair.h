@@ -10,3 +10,4 @@
 const char* errorString(CorsairError error);
 int keyboardIndex();
 int initKeyboard();
+int setBaseColor();

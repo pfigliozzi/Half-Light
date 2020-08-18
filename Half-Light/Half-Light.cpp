@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "corsair.h"
 #include "Half-Light.h"
+#include "corsair.h"
 #include <strsafe.h>
 
 #define MAX_LOADSTRING 100
@@ -42,6 +43,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // TODO: Place code here.
 
 	registerRawInputDevice();
+	initKeyboard();
+	setBaseColor();
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);

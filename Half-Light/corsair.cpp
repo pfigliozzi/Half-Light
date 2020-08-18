@@ -6,6 +6,8 @@
 #include "CorsairLayers/CorsairLayers.h"
 
 #include <iostream>
+#include <stdlib.h>
+#include <vector>
 
 const char* errorString(CorsairError error)
 {
@@ -56,6 +58,28 @@ int initKeyboard()
 		system("pause");
 		return -1;
 	}
+
+	return 0;
+}
+
+int setBaseColor()
+{
+	CorsairLedPositions* keyboardLeds;
+	keyboardLeds = CorsairGetLedPositions();
+	CorsairLedColor* ledColors;
+	ledColors = new CorsairLedColor[keyboardLeds->numberOfLed];
+	//std::vector<CorsairLedColor> ledColors; // Have to use vector because when making arrays the size needs to be const at COMPILE time.
+	//vector<CorsairLedPosition> pLeds;
+
+	for (int i = 0; i < keyboardLeds->numberOfLed; ++i) {
+		ledColors[i].ledId = keyboardLeds->pLedPosition[i].ledId;
+		// Might want to move these values to global variable.
+		ledColors[i].r = 255;
+		ledColors[i].g = 0;
+		ledColors[i].b = 0;
+	}
+
+	CorsairSetLedsColors(keyboardLeds->numberOfLed, ledColors);
 
 	return 0;
 }
