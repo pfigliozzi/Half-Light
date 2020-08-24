@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <vector>
+#include <map>
 
 const char* errorString(CorsairError error)
 {
@@ -88,4 +88,22 @@ int setBaseColor()
 	return 0;
 }
 
-int 
+
+std::map<int, CorsairLedId> getCorsiarKeyMap()
+{
+	std::map<int, CorsairLedId> corsairKeyMap;
+	corsairKeyMap.insert({ 0x1B, CLK_Escape });
+	corsairKeyMap.insert({ 0x70, CLK_F1 });
+	corsairKeyMap.insert({ 0x71, CLK_F2 });
+	corsairKeyMap.insert({ 0x72, CLK_F3 });
+	corsairKeyMap.insert({ 0x73, CLK_F4 });
+	corsairKeyMap.insert({ 0x74, CLK_F5 });
+	corsairKeyMap.insert({ 0x75, CLK_F6 });
+	corsairKeyMap.insert({ 0x76, CLK_F7 });
+	corsairKeyMap.insert({ 0x77, CLK_F8 });
+	corsairKeyMap.insert({ 0x78, CLK_F9 });
+	corsairKeyMap.insert({ 0x79, CLK_F10 });
+	corsairKeyMap.insert({ 0x7A, CLK_F11 });
+	corsairKeyMap.insert({ 0x7B, CLK_F12 });
+	return corsairKeyMap;
+}
