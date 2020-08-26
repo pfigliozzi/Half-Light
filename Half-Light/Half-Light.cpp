@@ -13,6 +13,7 @@
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+std::map<int, CorsairLedId> corsiarKeyMap = getCorsiarKeyMap();
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -191,6 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (raw->header.dwType == RIM_TYPEKEYBOARD)
 		{
+			changeKeyColor(corsiarKeyMap[raw->data.keyboard.VKey]);
 			auto hResult = StringCchPrintf(szTempOutput, STRSAFE_MAX_CCH, TEXT(" Kbd: make=%04x Flags:%04x Reserved:%04x ExtraInformation:%08x, msg=%04x VK=%04x \n"),
 				raw->data.keyboard.MakeCode,
 				raw->data.keyboard.Flags,
@@ -198,24 +200,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				raw->data.keyboard.ExtraInformation,
 				raw->data.keyboard.Message,
 				raw->data.keyboard.VKey);
-			if (FAILED(hResult))
-			{
-				// TODO: write error handler
-			}
-			OutputDebugString(szTempOutput);
-		}
-		else if (raw->header.dwType == RIM_TYPEMOUSE)
-		{
-			auto hResult = StringCchPrintf(szTempOutput, STRSAFE_MAX_CCH, TEXT("Mouse: usFlags=%04x ulButtons=%04x usButtonFlags=%04x usButtonData=%04x ulRawButtons=%04x lLastX=%04x lLastY=%04x ulExtraInformation=%04x\r\n"),
-				raw->data.mouse.usFlags,
-				raw->data.mouse.ulButtons,
-				raw->data.mouse.usButtonFlags,
-				raw->data.mouse.usButtonData,
-				raw->data.mouse.ulRawButtons,
-				raw->data.mouse.lLastX,
-				raw->data.mouse.lLastY,
-				raw->data.mouse.ulExtraInformation);
-
 			if (FAILED(hResult))
 			{
 				// TODO: write error handler

@@ -6,8 +6,11 @@
 #include "CorsairLayers/CorsairLayers.h"
 
 #include <iostream>
+#include <map>
 
 const char* errorString(CorsairError error);
 int keyboardIndex();
 int initKeyboard();
 int setBaseColor();
+std::map<int, CorsairLedId> getCorsiarKeyMap();
+int changeKeyColor(CorsairLedId ledId);
