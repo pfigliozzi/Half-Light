@@ -14,3 +14,4 @@ int initKeyboard();
 int setBaseColor();
 std::map<int, CorsairLedId> getCorsiarKeyMap();
 int changeKeyColor(CorsairLedId ledId);
+CorsairLedId getCorsairLedId(RAWINPUT* raw);

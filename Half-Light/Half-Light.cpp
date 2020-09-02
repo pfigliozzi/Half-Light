@@ -13,7 +13,7 @@
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-std::map<int, CorsairLedId> corsiarKeyMap = getCorsiarKeyMap();
+//std::map<int, CorsairLedId> corsiarKeyMap = getCorsiarKeyMap();
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -190,9 +190,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		TCHAR szTempOutput[100];
 
-		if (raw->header.dwType == RIM_TYPEKEYBOARD)
+		if (raw->header.dwType == RIM_TYPEKEYBOARD && raw->data.keyboard.Message != WM_KEYUP)
 		{
-			changeKeyColor(corsiarKeyMap[raw->data.keyboard.VKey]);
+			CorsairLedId ledId = getCorsairLedId(raw);
+			changeKeyColor(ledId);
+			//changeKeyColor(corsiarKeyMap[raw->data.keyboard.VKey]);
 			auto hResult = StringCchPrintf(szTempOutput, STRSAFE_MAX_CCH, TEXT(" Kbd: make=%04x Flags:%04x Reserved:%04x ExtraInformation:%08x, msg=%04x VK=%04x \n"),
 				raw->data.keyboard.MakeCode,
 				raw->data.keyboard.Flags,
