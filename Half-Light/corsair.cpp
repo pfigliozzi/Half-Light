@@ -88,7 +88,6 @@ int setBaseColor()
 	return 0;
 }
 
-
 std::map<int, CorsairLedId> getCorsiarKeyMap()
 {
 	std::map<int, CorsairLedId> corsairKeyMap;
@@ -224,30 +223,6 @@ std::map<int, CorsairLedId> getCorsiarKeyMap()
 
 std::map<int, CorsairLedId> corsairKeyMap = getCorsiarKeyMap();
 
-int changeKeyColor(CorsairLedId ledId)
-{
-	CorsairLedColor color;
-	color.ledId = ledId;
-	color.r = 255;
-	color.g = 255;
-	color.b = 255;
-
-	bool corsairSuccess = CorsairSetLedsColors(1, &color);
-	return 0;
-}
-
-struct RawInputKeyId
-{
-	int VKey;
-	int flag = 0x00;
-
-	bool operator<(const RawInputKeyId& t) const
-	{
-		
-		return (this->VKey < t.VKey && this->flag < t.flag);
-	}
-};
-
 struct LeftAndRightKeyIds
 {
 	CorsairLedId leftKey;
@@ -257,7 +232,7 @@ struct LeftAndRightKeyIds
 std::map<int, LeftAndRightKeyIds> getAmbiguousKeyMap()
 {
 	std::map<int, LeftAndRightKeyIds> ambiguousKeyMap;
-	
+
 	LeftAndRightKeyIds CTRLKeys;
 	CTRLKeys.leftKey = CLK_LeftCtrl;
 	CTRLKeys.rightKey = CLK_RightCtrl;
@@ -277,6 +252,18 @@ std::map<int, LeftAndRightKeyIds> getAmbiguousKeyMap()
 }
 
 std::map<int, LeftAndRightKeyIds> ambiguousKeyMap = getAmbiguousKeyMap();
+
+int changeKeyColor(CorsairLedId ledId)
+{
+	CorsairLedColor color;
+	color.ledId = ledId;
+	color.r = 255;
+	color.g = 255;
+	color.b = 255;
+
+	bool corsairSuccess = CorsairSetLedsColors(1, &color);
+	return 0;
+}
 
 std::array<int, 5> ambiguousKeys = { 0x11, 0x12, 0x0D };
 
@@ -309,7 +296,6 @@ CorsairLedId getShiftLedId(RAWINPUT* raw)
 
 CorsairLedId getAmbiguousKeyId(RAWINPUT* raw)
 {
-	RawInputKeyId rawInputKey;
 	LeftAndRightKeyIds possibleKeys = ambiguousKeyMap[raw->data.keyboard.VKey];
 	if (raw->data.keyboard.Flags == 0x00) {
 		return possibleKeys.leftKey;
