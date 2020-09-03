@@ -70,8 +70,6 @@ int setBaseColor()
 	keyboardLeds = CorsairGetLedPositions();
 	CorsairLedColor* ledColors;
 	ledColors = new CorsairLedColor[keyboardLeds->numberOfLed];
-	//std::vector<CorsairLedColor> ledColors; // Have to use vector because when making arrays the size needs to be const at COMPILE time.
-	//vector<CorsairLedPosition> pLeds;
 
 	for (int i = 0; i < keyboardLeds->numberOfLed; ++i) {
 		ledColors[i].ledId = keyboardLeds->pLedPosition[i].ledId;
@@ -150,9 +148,9 @@ std::map<int, CorsairLedId> getCorsiarKeyMap()
 	corsairKeyMap.insert({ 0x4C, CLK_L });
 	corsairKeyMap.insert({ 0xBA, CLK_SemicolonAndColon });
 	corsairKeyMap.insert({ 0xDE, CLK_ApostropheAndDoubleQuote });
-	//corsairKeyMap.insert({ 0x0D, CLK_Enter });
+	// CLK_Enter is implemented in getAmbiguousKeyId
 
-	//corsairKeyMap.insert({ 0x10, CLK_LeftShift }); // Will need to fix
+	// CLK_LeftShift is implemented in getShiftLedId
 	corsairKeyMap.insert({ 0x5A, CLK_Z });
 	corsairKeyMap.insert({ 0x58, CLK_X });
 	corsairKeyMap.insert({ 0x43, CLK_C });
@@ -163,16 +161,16 @@ std::map<int, CorsairLedId> getCorsiarKeyMap()
 	corsairKeyMap.insert({ 0xBC, CLK_CommaAndLessThan });
 	corsairKeyMap.insert({ 0xBE, CLK_PeriodAndBiggerThan });
 	corsairKeyMap.insert({ 0xBF, CLK_SlashAndQuestionMark });
-	//corsairKeyMap.insert({ 0x10, CLK_RightShift }); // Will need to fix
-
-	//corsairKeyMap.insert({ 0x11, CLK_LeftCtrl }); // Will need to fix
+	// CLK_RightShift is implemented in getShiftLedId
+	
+	// CLK_LeftCtrl is implemented in getAmbiguousKeyId
 	corsairKeyMap.insert({ 0x5B, CLK_LeftGui });
-	//corsairKeyMap.insert({ 0x12, CLK_LeftAlt }); // Will need to fix
+	// CLK_LeftAlt is implemented in getAmbiguousKeyId
 	corsairKeyMap.insert({ 0x20, CLK_Space });
-	//corsairKeyMap.insert({ 0x12, CLK_RightAlt }); // Will need to fix
+	// CLK_RightAlt is implemented in getAmbiguousKeyId
 	corsairKeyMap.insert({ 0x5C, CLK_RightGui });
 	corsairKeyMap.insert({ 0x5D, CLK_Application });
-	//corsairKeyMap.insert({ 0x11, CLK_RightCtrl }); // Will need to fix
+	// CLK_RightCtrl is implemented in getAmbiguousKeyId
 
 	corsairKeyMap.insert({ 0x2C, CLK_PrintScreen });
 	corsairKeyMap.insert({ 0x91, CLK_ScrollLock });
@@ -210,7 +208,7 @@ std::map<int, CorsairLedId> getCorsiarKeyMap()
 	corsairKeyMap.insert({ 0x62, CLK_Keypad2 });
 	corsairKeyMap.insert({ 0x63, CLK_Keypad3 });
 
-	//corsairKeyMap.insert({ 0x0D, CLK_KeypadEnter }); // Will need to fix
+	// CLK_KeypadEnter is implemented in getAmbiguousKeyId
 
 	corsairKeyMap.insert({ 0x60, CLK_Keypad0 });
 	corsairKeyMap.insert({ 0x6E, CLK_KeypadPeriodAndDelete });
@@ -259,16 +257,7 @@ struct LeftAndRightKeyIds
 std::map<int, LeftAndRightKeyIds> getAmbiguousKeyMap()
 {
 	std::map<int, LeftAndRightKeyIds> ambiguousKeyMap;
-	/*RawInputKeyId LeftShiftKey;
-	LeftShiftKey.makeCode = 0x2a;
-	LeftShiftKey.VKey = 0x10;
-	ambiguousKeyMap.insert({ LeftShiftKey, CLK_LeftShift });
-
-	RawInputKeyId RightShiftKey;
-	RightShiftKey.makeCode = 0x36;
-	RightShiftKey.VKey = 0x10;
-	ambiguousKeyMap.insert({ RightShiftKey, CLK_RightShift });*/
-
+	
 	LeftAndRightKeyIds CTRLKeys;
 	CTRLKeys.leftKey = CLK_LeftCtrl;
 	CTRLKeys.rightKey = CLK_RightCtrl;
@@ -283,26 +272,6 @@ std::map<int, LeftAndRightKeyIds> getAmbiguousKeyMap()
 	EnterKeys.leftKey = CLK_Enter;
 	EnterKeys.rightKey = CLK_KeypadEnter;
 	ambiguousKeyMap.insert({ 0x0D, EnterKeys });
-
-	/*RawInputKeyId LeftAltKey;
-	LeftAltKey.flag = 0x00;
-	LeftAltKey.VKey = 0x12;
-	ambiguousKeyMap.insert({ LeftAltKey, CLK_LeftAlt });
-
-	RawInputKeyId RightAltKey;
-	RightAltKey.flag = 0x02;
-	RightAltKey.VKey = 0x12;
-	ambiguousKeyMap.insert({ RightAltKey, CLK_RightAlt });
-
-	RawInputKeyId EnterKey;
-	EnterKey.flag = 0x00;
-	EnterKey.VKey = 0x0D;
-	ambiguousKeyMap.insert({ EnterKey, CLK_Enter });
-
-	RawInputKeyId NumPadEnterKey;
-	NumPadEnterKey.flag = 0x02;
-	NumPadEnterKey.VKey = 0x0D;
-	ambiguousKeyMap.insert({ NumPadEnterKey, CLK_KeypadEnter });*/
 
 	return ambiguousKeyMap;
 }
@@ -355,15 +324,15 @@ CorsairLedId getAmbiguousKeyId(RAWINPUT* raw)
 // to determin the proper key.
 CorsairLedId getCorsairLedId(RAWINPUT* raw)
 {
-	// check for key that requires checking makecode (ex. SHIFT, numpad, etc)
-	// Call a function that uses the makecode to find the key. Return
 	if (isShiftKey(raw)) {
 		return getShiftLedId(raw);
 	}
-	if (isAmbiguousKey(raw) == true) {
+	else if (isAmbiguousKey(raw) == true) {
 		return getAmbiguousKeyId(raw);
 	}
-
-	// Else: use the normal keymap to find the VKey that maps to the CorsiarLedId.
-	return corsairKeyMap[raw->data.keyboard.VKey];
+	else
+	{
+		return corsairKeyMap[raw->data.keyboard.VKey];
+	}
+	
 }
