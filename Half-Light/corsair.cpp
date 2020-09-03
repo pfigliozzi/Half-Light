@@ -88,6 +88,18 @@ int setBaseColor()
 	return 0;
 }
 
+int changeKeyColor(CorsairLedId ledId)
+{
+	CorsairLedColor color;
+	color.ledId = ledId;
+	color.r = 255;
+	color.g = 255;
+	color.b = 255;
+
+	bool corsairSuccess = CorsairSetLedsColors(1, &color);
+	return 0;
+}
+
 std::map<int, CorsairLedId> getCorsiarKeyMap()
 {
 	std::map<int, CorsairLedId> corsairKeyMap;
@@ -252,18 +264,6 @@ std::map<int, LeftAndRightKeyIds> getAmbiguousKeyMap()
 }
 
 std::map<int, LeftAndRightKeyIds> ambiguousKeyMap = getAmbiguousKeyMap();
-
-int changeKeyColor(CorsairLedId ledId)
-{
-	CorsairLedColor color;
-	color.ledId = ledId;
-	color.r = 255;
-	color.g = 255;
-	color.b = 255;
-
-	bool corsairSuccess = CorsairSetLedsColors(1, &color);
-	return 0;
-}
 
 std::array<int, 5> ambiguousKeys = { 0x11, 0x12, 0x0D };
 
