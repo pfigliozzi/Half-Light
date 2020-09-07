@@ -140,6 +140,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - post a quit message and return
 //
 //
+// FEEDBACK To subscribe to keypress event when the window doesn't have focus go here https://stackoverflow.com/questions/5024843/how-to-detect-keypress-while-program-is-running-in-background-in-win32-c
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
