@@ -69,9 +69,10 @@ int setBaseColor()
 	CorsairLedPositions* keyboardLeds;
 	keyboardLeds = CorsairGetLedPositions();
 	CorsairLedColor* ledColors;
-	ledColors = new CorsairLedColor[keyboardLeds->numberOfLed];
+	int totalKeys = keyboardLeds->numberOfLed;
+	ledColors = new CorsairLedColor[totalKeys];
 
-	for (int i = 0; i < keyboardLeds->numberOfLed; ++i) {
+	for (int i = 0; i < totalKeys; ++i) {
 		ledColors[i].ledId = keyboardLeds->pLedPosition[i].ledId;
 		// Might want to move these values to global variable.
 		ledColors[i].r = 255;
@@ -79,7 +80,7 @@ int setBaseColor()
 		ledColors[i].b = 0;
 	}
 
-	bool corsiarSuccess = CorsairSetLedsColors(keyboardLeds->numberOfLed, ledColors);
+	bool corsiarSuccess = CorsairSetLedsColors(totalKeys, ledColors);
 	if (corsiarSuccess != true) {
 		CorsairGetLastError();
 		return -1;
@@ -88,6 +89,7 @@ int setBaseColor()
 	return 0;
 }
 
+// FEEDBACK: Use changeKeyColor in setBaseColor in the for loop to change each key individually.
 int changeKeyColor(CorsairLedId ledId)
 {
 	CorsairLedColor color;
@@ -278,6 +280,17 @@ bool isAmbiguousKey(RAWINPUT* raw)
 	return false;
 }
 
+CorsairLedId getAmbiguousKeyId(RAWINPUT* raw)
+{
+	LeftAndRightKeyIds possibleKeys = ambiguousKeyMap[raw->data.keyboard.VKey];
+	if (raw->data.keyboard.Flags == 0x00) {
+		return possibleKeys.leftKey;
+	}
+	else if (raw->data.keyboard.Flags == 0x02) {
+		return possibleKeys.rightKey;
+	}
+}
+
 bool isShiftKey(RAWINPUT* raw)
 {
 	if (raw->data.keyboard.VKey == 0x10) {
@@ -294,26 +307,17 @@ CorsairLedId getShiftLedId(RAWINPUT* raw)
 	return CLK_RightShift;
 }
 
-CorsairLedId getAmbiguousKeyId(RAWINPUT* raw)
-{
-	LeftAndRightKeyIds possibleKeys = ambiguousKeyMap[raw->data.keyboard.VKey];
-	if (raw->data.keyboard.Flags == 0x00) {
-		return possibleKeys.leftKey;
-	}
-	else if (raw->data.keyboard.Flags == 0x02) {
-		return possibleKeys.rightKey;
-	}
-}
-
 // Returns a CorsairLedId given RAWINPUT keyboard message from windows.
 // Will use the hard coded values of the VKey codes and the MakeCodes 
 // to determin the proper key.
+// FEEDBACK Reorder the operations so that the corsairKeyMap check happens first and it will retun nulls for ambiguous keys
+//		    and if the NULL is returned then you go into the functions that figures out which shift/ctrl/alt it is.
 CorsairLedId getCorsairLedId(RAWINPUT* raw)
 {
 	if (isShiftKey(raw)) {
 		return getShiftLedId(raw);
 	}
-	else if (isAmbiguousKey(raw) == true) {
+	else if (isAmbiguousKey(raw)) {
 		return getAmbiguousKeyId(raw);
 	}
 	else
