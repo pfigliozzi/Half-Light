@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <map>
-
+// FEEDBACK Look into automatically generating header files!
 const char* errorString(CorsairError error);
 int keyboardIndex();
 int initKeyboard();
