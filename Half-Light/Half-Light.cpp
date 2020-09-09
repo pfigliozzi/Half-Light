@@ -20,14 +20,15 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-
-void registerRawInputDevice()
+// Registers the target window to recieve rawinput keyboard events, even if not 
+// in focus.
+void registerRawInputDevice(HWND hWnd)
 {
 	RAWINPUTDEVICE dev;
 	dev.usUsagePage = 1;
 	dev.usUsage = 6;
-	dev.dwFlags = 0;
-	dev.hwndTarget = NULL;
+	dev.dwFlags = RIDEV_INPUTSINK;
+	dev.hwndTarget = hWnd;
 
 	RegisterRawInputDevices(&dev, 1, sizeof(dev));
 }
@@ -42,7 +43,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // TODO: Place code here.
 
-	registerRawInputDevice();
 	initKeyboard();
 	setBaseColor();
 
@@ -123,6 +123,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    {
       return FALSE;
    }
+
+   registerRawInputDevice(hWnd);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
